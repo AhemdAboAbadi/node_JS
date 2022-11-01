@@ -1,19 +1,30 @@
-const http = require("http");
+const express = require("express");
 
-const sever = http.createServer((req, res) => {
-  if (req.url === "/") {
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.write("<h1>Hello in home page</h1>");
-    res.end();
-  } else if (req.url === "/about") {
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.write("<h1>Hello in about page</h1>");
-    res.end();
-  } else {
-    res.writeHead(404, { "Content-Type": "text/html" });
-    res.write("<h1>page not found</h1>");
-    res.end();
-  }
+const app = express();
+
+const { products } = require("./data");
+
+app.get("/", (req, res) => {
+  res.send("<h1>Home Page</h1><a href='/api/products'>products</a>");
 });
 
-sever.listen(5000);
+app.get("/api/products", (req, res) => {
+  const newProducts = products.map((product) => {
+    const { id, name, image } = product;
+    return { id, name, image };
+  });
+
+  res.json(newProducts);
+});
+
+app.get("/about", (req, res) => {
+  res.send("About Page");
+});
+
+app.all("*", (req, res) => {
+  console.log("404");
+  res.status(404).send("OPS!!, page not found!!");
+});
+app.listen(5000, () => {
+  console.log("Server is running on port 5000 http://localhost:5000");
+});
