@@ -1,16 +1,25 @@
 const express = require("express");
-const logger = require("./logger");
-const authorize = require("./authorize");
-const morgan = require("morgan");
 const app = express();
+const { people } = require("./data");
 
-app.use(morgan("tiny"));
+app.use(express.static("./methods-public"));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Home");
+app.get("/api/people", (req, res) => {
+  res.status(200).json({ success: true, data: people });
 });
-app.get("/about", (req, res) => {
-  res.send("about");
+
+app.post("/login", (req, res) => {
+  console.log(req.body.name);
+  const { name } = req.body;
+
+  if (!name) {
+    return res
+      .status(401)
+      .json({ success: false, msg: "Please provide credentials" });
+  }
+  return res.status(201).send({ success: true, person: name }); 
 });
 
 app.listen(5000, () => {
